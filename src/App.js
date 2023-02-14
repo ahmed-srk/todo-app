@@ -1,10 +1,17 @@
 import React from "react";
-import { Table } from "./Table";
+import { DisplayTable } from "./DisplayTable";
+import AddToDoList from "./AddToDoList";
 
 function App() {
+    const [showModal, setShowModal] = React.useState(false)    
+
     return (
         <div className="App">
-            <Table />
+            <DisplayTable />
+
+            {showModal && <AddToDoList setShowModal={setShowModal} />}
+
+            <button onClick={() => setShowModal(true)}>Create To-do List</button>
         </div>
     );
 }

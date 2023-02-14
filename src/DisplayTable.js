@@ -1,7 +1,6 @@
 import React from "react";
-import "date-fns";
 
-export function Table(props){
+export function DisplayTable(props){
     const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     const acts = ['prayer', 'exercise', 'study', 'fasting', 'eating']
     const dailyUpdate = acts.map((act) => ({actName: act, dayUpdate: dayNames.map((day) => ({dayOfWeek: day, completed: false}))}))
