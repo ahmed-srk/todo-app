@@ -15,14 +15,12 @@ export function DisplayTable(props){
             </thead>
             <tbody>
                 {
-                    dailyUpdate.map((activity, key) => {
-                        return (
-                            <tr key={key}>
-                                <th>{activity.actName[0].toUpperCase() + activity.actName.substring(1)}</th>
-                                {activity.dayUpdate.map((item, key) => <td key={key}>{item.dayOfWeek}</td> )}
-                            </tr>
-                        )
-                    })
+                    dailyUpdate.map((activity, key) => 
+                        <tr key={key}>
+                            <th>{activity.actName[0].toUpperCase() + activity.actName.substring(1)}</th>
+                            {activity.dayUpdate.map((item, key) => <td key={key}>{item.dayOfWeek}</td> )}
+                        </tr>
+                    )
                 }       
             </tbody>
         </table>

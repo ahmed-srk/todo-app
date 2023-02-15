@@ -5,7 +5,7 @@ export default function CustomModal(props){
         <div>
             <div className=" flex justify-center items-center min-h-full max-w-fit m-auto overflow-y-auto overflow-x-hidden fixed inset-0 z-50 outline-none focus:outline-none">
                 <div className="relative w-auto flex items-center">
-                    <div className=" relative flex flex-col w-full p-4 space-y-6 bg-white rounded shadow-lg outline-none focus:outline-none">
+                    <div className=" relative flex flex-col w-full p-4 space-y-4 bg-white rounded shadow-lg outline-none focus:outline-none">
                         <Header title={`Create new ${props.title}`} setShowModal={props.setShowModal} />
                         <div className="relative flex-auto">{props.body}</div>
                         <Footer title={`Create A ${props.title}`} setShowModal={props.setShowModal} createContent={props.createContent} />

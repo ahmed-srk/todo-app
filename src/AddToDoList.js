@@ -10,12 +10,17 @@ function AddToDoList(props){
         startDate: format(new Date(), 'yyyy-MM-dd'),
     })
 
+    const [formValues, setFormValues] = React.useState([
+        {label: "start date", type: "date", value: format(new Date(), 'yyyy-MM-dd'), required: true},
+        {label: "name", type: "text", value: "", required: true},
+    ]);
+
     const [error, setError] = React.useState(false)
     const { errorMsg } = checkErrorForm(error)
 
     function createToDoList(){
         for(const key in toDoList){
-            if(toDoList[key] === '' || toDoList[key] === isNaN){
+            if(!toDoList[key].length){
                 setError(true)
                 return
             }
@@ -24,6 +29,8 @@ function AddToDoList(props){
         props.setShowModal(false)
     }
 
+    console.log(toDoList.startDate.length)
+
     return(
         <div>
             {
@@ -31,7 +38,7 @@ function AddToDoList(props){
                     title = 'To-Do List'
                     setShowModal = {props.setShowModal}
                     createContent = {createToDoList}
-                    body = {<AddListForm toDoList={toDoList} setToDoList={setToDoList} errorMsg={errorMsg} />}
+                    body = {<AddListForm formValues={formValues} setFormValues={setFormValues} toDoList={toDoList} setToDoList={setToDoList} errorMsg={errorMsg} />}
                 />
             }
         </div>
