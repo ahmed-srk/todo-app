@@ -4,41 +4,41 @@ import { AddListForm } from "./AddListForm";
 import CustomModal from "./CustomModal";
 import { checkErrorForm } from "./FormComponents";
 
-function AddToDoList(props){
-    const [toDoList, setToDoList] = React.useState({
-        actsList: [],
-        startDate: format(new Date(), 'yyyy-MM-dd'),
-    })
-
+function AddToDoList({setToDoList, setShowModal}){
     const [formValues, setFormValues] = React.useState([
-        {label: "start date", type: "date", value: format(new Date(), 'yyyy-MM-dd'), required: true},
-        {label: "name", type: "text", value: "", required: true},
+        {id: 'startDate', label: 'start date', type: 'date', value: format(new Date(), 'yyyy-MM-dd'), required: true},
+        {id: `acts`, label: 'activity', type: 'text', value: '', required: true},
     ]);
 
     const [error, setError] = React.useState(false)
     const { errorMsg } = checkErrorForm(error)
 
     function createToDoList(){
-        for(const key in toDoList){
-            if(!toDoList[key].length){
+        for(const item of formValues){
+            if(item.required && (item.value === '' || item.value === isNaN)){
                 setError(true)
                 return
             }
         }
-        
-        props.setShowModal(false)
-    }
 
-    console.log(toDoList.startDate.length)
+        setToDoList(() => {
+            const startDate = formValues[0].value
+            const actsList = []
+            for(let i = 1; i < formValues.length; i++){ actsList.push(formValues[i].value) }
+            return {actsList: actsList, startDate: startDate}
+        })
+
+        setShowModal(false)
+    }
 
     return(
         <div>
             {
                 <CustomModal 
                     title = 'To-Do List'
-                    setShowModal = {props.setShowModal}
+                    setShowModal = {setShowModal}
                     createContent = {createToDoList}
-                    body = {<AddListForm formValues={formValues} setFormValues={setFormValues} toDoList={toDoList} setToDoList={setToDoList} errorMsg={errorMsg} />}
+                    body = {<AddListForm formValues={formValues} setFormValues={setFormValues} errorMsg={errorMsg} />}
                 />
             }
         </div>

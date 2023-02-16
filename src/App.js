@@ -1,17 +1,17 @@
 import React from "react";
 import { DisplayTable } from "./DisplayTable";
-import AddToDoList from "./AddToDoList";
+import OpenPage from "./OpenPage";
 
 function App() {
-    const [showModal, setShowModal] = React.useState(false)    
+    const [toDoList, setToDoList] = React.useState()
 
     return (
-        <div className="App">
-            <DisplayTable />
-
-            {showModal && <AddToDoList setShowModal={setShowModal} />}
-
-            <button onClick={() => setShowModal(true)}>Create To-do List</button>
+        <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-pink-700 to-blue-700">
+            {
+                toDoList ?
+                <DisplayTable toDoList={toDoList} /> :
+                <OpenPage setToDoList={setToDoList} />
+            }
         </div>
     );
 }
