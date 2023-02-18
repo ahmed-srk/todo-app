@@ -7,7 +7,8 @@ function CustomInput({objValue, onChange, index, errorMsg}){
             <h4 className=" text-sm font-light text-gray-500">
                 {label[0].toUpperCase() + label.substring(1)}
                 {required && <span className=" font-bold text-black"> &#42;</span>}
-                </h4>
+            </h4>
+
             <input
                 type = {type}
                 value = {value}
@@ -16,6 +17,7 @@ function CustomInput({objValue, onChange, index, errorMsg}){
                 className = {`form-input ${styleClass}`}
                 style = {required ? errorMsg.styleTextBox(value) : {}}
             />
+            
             {required && <p style={errorMsg.styleText}>{!value && errorMsg.text}</p>}
         </div>
     )

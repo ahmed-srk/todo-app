@@ -24,7 +24,7 @@ function AddToDoList({setToDoList, setShowModal}){
         setToDoList(() => {
             const startDate = formValues[0].value
             const actsList = []
-            for(let i = 1; i < formValues.length; i++){ actsList.push(formValues[i].value) }
+            for(let i = 1; i < formValues.length; i++){ formValues[i].value && actsList.push(formValues[i].value) }
             return {actsList: actsList, startDate: startDate}
         })
 

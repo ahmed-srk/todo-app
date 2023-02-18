@@ -6,7 +6,7 @@ function App() {
     const [toDoList, setToDoList] = React.useState()
 
     return (
-        <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-pink-700 to-blue-700">
+        <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-500 to-blue-600">
             {
                 toDoList ?
                 <DisplayTable toDoList={toDoList} /> :
