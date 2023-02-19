@@ -1,7 +1,7 @@
 import React from "react"
 import { CustomInput } from "./FormComponents"
 
-export function AddListForm({formValues, setFormValues, errorMsg}){
+export function AddListForm({formValues, setFormValues, errorMsg, repeatedValuesError}){
     function handleChange (event, index){
         const { value } = event.target
         setFormValues((prev) => {
@@ -14,7 +14,7 @@ export function AddListForm({formValues, setFormValues, errorMsg}){
     function addInput(event){
         event.preventDefault()
         setFormValues((prev) => {
-            return [...prev, {id: `acts`, label: `activity ${formValues.length}`, type: 'text', value: '', required: false}]
+            return [...prev, {id: `acts`, label: `Activity ${formValues.length}`, type: 'text', value: `Activity ${formValues.length}`, required: false}]
         })
     }
 
@@ -42,12 +42,13 @@ export function AddListForm({formValues, setFormValues, errorMsg}){
                     ))
                 }
             </div>
+
             <div className=" col-span-2 grid grid-cols-2 gap-2">
-                <button onClick={(event) => addInput(event)} className="w-full bg-green-700 text-white font-bold uppercase text-sm py-3 rounded-md shadow hover:shadow-lg outline-none focus:outline-none">
+                <button onClick={(event) => addInput(event)} className="w-full bg-green-700 text-white font-bold uppercase text-sm py-3 rounded-md shadow hover:shadow-lg">
                     Add Activity
                 </button>
                 <button onClick={(event) => delInput(event)} disabled={formValues.length < 3 && true} 
-                        className={`w-full ${formValues.length < 3 ? `bg-gray-500` : `bg-red-600`} text-white font-bold uppercase text-sm py-3 rounded-md shadow hover:shadow-lg outline-none focus:outline-none`}>
+                        className={`w-full ${formValues.length < 3 ? `bg-gray-500` : `bg-red-600`} text-white font-bold uppercase text-sm py-3 rounded-md shadow hover:shadow-lg`}>
                     Delete Activity
                 </button>
             </div>

@@ -9,7 +9,7 @@ function App() {
         <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-500 to-blue-600">
             {
                 toDoList ?
-                <DisplayTable toDoList={toDoList} /> :
+                <DisplayTable {...toDoList} /> :
                 <OpenPage setToDoList={setToDoList} />
             }
         </div>

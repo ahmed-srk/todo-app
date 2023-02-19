@@ -14,10 +14,20 @@ function AddToDoList({setToDoList, setShowModal}){
     const { errorMsg } = checkErrorForm(error)
 
     function createToDoList(){
-        for(const item of formValues){
+        for(let i = 1; i < formValues.length; i++){
+            const item = formValues[i]
             if(item.required && (item.value === '' || item.value === isNaN)){
                 setError(true)
                 return
+            }
+            // This code is not manageable and unfinished
+            else {
+                for(let j = i + 1; j < formValues.length; j++){
+                    if(item.value === formValues[j].value){
+                        console.log('Activity Values cannot be the same.')
+                        return
+                    }
+                }
             }
         }
 
@@ -38,7 +48,7 @@ function AddToDoList({setToDoList, setShowModal}){
                     title = 'To-Do List'
                     setShowModal = {setShowModal}
                     createContent = {createToDoList}
-                    body = {<AddListForm formValues={formValues} setFormValues={setFormValues} errorMsg={errorMsg} />}
+                    body = {<AddListForm formValues={formValues} setFormValues={setFormValues} errorMsg={errorMsg} repeatedValuesError={error.repeatedValuesError} />}
                 />
             }
         </div>

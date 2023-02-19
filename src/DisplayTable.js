@@ -1,15 +1,18 @@
 import React from "react";
-import {addDays, eachDayOfInterval, format} from 'date-fns'
+import {addDays, eachDayOfInterval, format, isMonday, isToday, previousMonday} from 'date-fns'
 
-export function DisplayTable({toDoList}){
-    const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+export function DisplayTable({actsList, startDate}){
+    const dayNames = ['mon', 'tues', 'wed', 'thurs', 'fri', 'sat', 'sun']
     const [dailyUpdate, setDailyUpdate] = React.useState(
-        toDoList.actsList.map((act) => ( {actName: act, dayUpdate: dayNames.map((day) => ( {dayOfWeek: day, completed: false} ))} ))
+        actsList.map((act) => ( {actName: act, dayUpdate: dayNames.map((day) => ( {dayOfWeek: day, completed: false} ))} ))
     )
 
-    const [dateRange, setDateRange] = React.useState(
-        eachDayOfInterval( {start: new Date(toDoList.startDate), end: addDays(new Date(toDoList.startDate), 6)} )
-    )
+    const [weekRange, setWeekRange] = React.useState(() => {
+        const toDoStartDate = new Date(startDate)
+        const weekStartDate = isMonday(toDoStartDate) ? toDoStartDate : previousMonday(toDoStartDate)
+
+        return eachDayOfInterval( {start: weekStartDate, end: addDays(weekStartDate, 6)} )
+    })
 
     function onClickActivity(activity, day){
         setDailyUpdate((prev) => prev.map((act) => 
@@ -24,7 +27,13 @@ export function DisplayTable({toDoList}){
             <thead>
                 <tr>
                     <th></th>
-                    {dateRange.map((val, key) => <th className=" min-w-[120px] p-3" key={key}>{format(val, 'dd/MM')}</th> )}
+                    {
+                        weekRange.map((val, key) => 
+                            <th className=" min-w-[120px] p-3" key={key}>
+                                {isToday(val) ? `TODAY` : format(val, 'dd/MM')}
+                            </th> 
+                        )
+                    }
                 </tr>
             </thead>
             <tbody>
