@@ -1,12 +1,50 @@
 import React from "react"
+import { differenceInCalendarDays } from "date-fns"
 import { CustomInput } from "./FormComponents"
 
-export function AddListForm({formValues, setFormValues, errorMsg, repeatedValuesError}){
+export function AddListForm({formValues, setFormValues, error, errorMsg}){
     function handleChange (event, index){
         const { value } = event.target
         setFormValues((prev) => {
             return prev.map((item, itemIndex) => {
-                return itemIndex === index ? {...item, value: value} : {...item}
+                if(itemIndex === index){
+                    if(index === 0){
+                        return (
+                            differenceInCalendarDays(new Date(value), new Date()) > 0 ?
+                            {...item, value: value, condition: false} :
+                            {...item, value: value, condition: true}
+                        )
+                    }
+                    else{
+                        for(let j = 1; j < formValues.length; j++){
+                            if(index === j){
+                                continue
+                            }
+                            else if(value === formValues[j].value){
+                                return {...item, value: value, condition: false}
+                            }
+                        }
+                        
+                        return {...item, value: value, condition: true}
+                    }
+                }
+                else{
+                    if(itemIndex === 0){
+                        return {...item}
+                    }
+                    else{
+                        for(let j = 1; j < formValues.length; j++){
+                            if(itemIndex === j){
+                                continue
+                            }
+                            else if(item.value === formValues[j].value){
+                                return {...item, condition: false}
+                            }
+                        }
+                        
+                        return {...item, condition: true}
+                    }
+                }
             })
         })
     }
@@ -14,7 +52,7 @@ export function AddListForm({formValues, setFormValues, errorMsg, repeatedValues
     function addInput(event){
         event.preventDefault()
         setFormValues((prev) => {
-            return [...prev, {id: `acts`, label: `Activity ${formValues.length}`, type: 'text', value: `Activity ${formValues.length}`, required: false}]
+            return [...prev, {id: `acts`, label: `Activity ${formValues.length}`, type: 'text', value: `Activity ${formValues.length}`, required: false, condition: true}]
         })
     }
 
@@ -27,20 +65,49 @@ export function AddListForm({formValues, setFormValues, errorMsg, repeatedValues
         })
     }
 
+    React.useEffect(() => {
+        setFormValues((prev) => {
+            return prev.map((item, index) => {
+                if(index === 0){
+                    return {...item}
+                }
+                else{
+                    for(let j = 1; j < formValues.length; j++){
+                        if(j === index){
+                            continue
+                        }
+                        else if(item.value === formValues[j].value){
+                            return {...item, condition: false}
+                        }
+                    }
+                        
+                    return {...item, condition: true}
+                }
+            })
+        })
+
+        // eslint-disable-next-line
+    }, [formValues.length])
+
     return(
         <form className=" grid grid-flow-row grid-cols-2 gap-x-3">          
             <div className=" col-span-2">
                 {  
                     formValues.map((obj, index) => (
-                        <CustomInput
-                            key = {index}
-                            objValue = {obj}
-                            onChange = {handleChange}
-                            index = {index}
-                            errorMsg = {errorMsg}
-                        />
+                        <div key = {index}>
+                            <CustomInput          
+                                objValue = {obj}
+                                onChange = {handleChange}
+                                index = {index}
+                                errorMsg = {errorMsg}
+                            />
+
+                            {index === 0 && !obj.condition && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Date should not exceed Today!</p>}
+                            {index !== 0 && !obj.condition && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Activity names cannot be the same!</p>}
+                        </div>                        
                     ))
                 }
+                
             </div>
 
             <div className=" col-span-2 grid grid-cols-2 gap-2">

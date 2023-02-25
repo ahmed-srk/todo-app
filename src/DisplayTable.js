@@ -7,6 +7,7 @@ export function DisplayTable({actsList, startDate}){
         actsList.map((act) => ( {actName: act, dayUpdate: dayNames.map((day) => ( {dayOfWeek: day, completed: false} ))} ))
     )
 
+    // eslint-disable-next-line
     const [weekRange, setWeekRange] = React.useState(() => {
         const toDoStartDate = new Date(startDate)
         const weekStartDate = isMonday(toDoStartDate) ? toDoStartDate : previousMonday(toDoStartDate)
@@ -21,6 +22,16 @@ export function DisplayTable({actsList, startDate}){
             {...act}
         ))
     }
+
+    let today = new Date()
+    let now = today.getSeconds()
+
+    React.useEffect(() => {
+        // setInterval(() => {
+        //     now = now + 1
+        //     console.log(now)
+        // }, '1000');
+    }, [now])
 
     return (
         <table>
