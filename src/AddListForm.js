@@ -1,47 +1,35 @@
 import React from "react"
-import { differenceInCalendarDays } from "date-fns"
+import { differenceInCalendarDays, isThisWeek } from "date-fns"
 import { CustomInput } from "./FormComponents"
 
-export function AddListForm({formValues, setFormValues, error, errorMsg}){
+export function AddListForm({formValues, setFormValues, errorMsg}){
     function handleChange (event, index){
         const { value } = event.target
         setFormValues((prev) => {
             return prev.map((item, itemIndex) => {
-                if(itemIndex === index){
-                    if(index === 0){
+                if (itemIndex === index){
+                    if (index === 0){
                         return (
-                            differenceInCalendarDays(new Date(value), new Date()) > 0 ?
-                            {...item, value: value, condition: false} :
-                            {...item, value: value, condition: true}
+                        isThisWeek(new Date(value), { weekStartsOn: 1 }) && differenceInCalendarDays(new Date(value), new Date()) <= 0 ?
+                            {...item, value: value, condition: true} :
+                            {...item, value: value, condition: false}
                         )
                     }
-                    else{
-                        for(let j = 1; j < formValues.length; j++){
-                            if(index === j){
-                                continue
-                            }
-                            else if(value === formValues[j].value){
-                                return {...item, value: value, condition: false}
-                            }
-                        }
-                        
+                    else {
+                        for (let j = 1; j < formValues.length; j++){
+                            if (index === j){ continue }
+                            else if (value === formValues[j].value){ return {...item, value: value, condition: false} }
+                        } 
                         return {...item, value: value, condition: true}
                     }
                 }
-                else{
-                    if(itemIndex === 0){
-                        return {...item}
-                    }
-                    else{
-                        for(let j = 1; j < formValues.length; j++){
-                            if(itemIndex === j){
-                                continue
-                            }
-                            else if(item.value === formValues[j].value){
-                                return {...item, condition: false}
-                            }
+                else {
+                    if (itemIndex === 0){ return {...item} }
+                    else {
+                        for (let j = 1; j < formValues.length; j++){
+                            if (itemIndex === j || index === j){ continue }
+                            else if (item.value === formValues[j].value || item.value === value){ return {...item, condition: false} }
                         }
-                        
                         return {...item, condition: true}
                     }
                 }
@@ -68,19 +56,12 @@ export function AddListForm({formValues, setFormValues, error, errorMsg}){
     React.useEffect(() => {
         setFormValues((prev) => {
             return prev.map((item, index) => {
-                if(index === 0){
-                    return {...item}
-                }
-                else{
-                    for(let j = 1; j < formValues.length; j++){
-                        if(j === index){
-                            continue
-                        }
-                        else if(item.value === formValues[j].value){
-                            return {...item, condition: false}
-                        }
-                    }
-                        
+                if (index === 0){ return {...item} }
+                else {
+                    for (let j = 1; j < formValues.length; j++){
+                        if (index === j){ continue }
+                        else if (item.value === formValues[j].value){ return {...item, condition: false} }
+                    }  
                     return {...item, condition: true}
                 }
             })
@@ -102,8 +83,8 @@ export function AddListForm({formValues, setFormValues, error, errorMsg}){
                                 errorMsg = {errorMsg}
                             />
 
-                            {index === 0 && !obj.condition && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Date should not exceed Today!</p>}
-                            {index !== 0 && !obj.condition && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Activity names cannot be the same!</p>}
+                            {index === 0 && !obj.condition && obj.value && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Date should be within this week till Today!</p>}
+                            {index !== 0 && !obj.condition && obj.value && <p style={{...errorMsg.styleText, marginTop: '-16px'}}>Activity names cannot be the same!</p>}
                         </div>                        
                     ))
                 }

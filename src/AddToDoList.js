@@ -1,11 +1,13 @@
+
 import React from "react";
-import { AddListForm } from "./AddListForm";
 import CustomModal from "./CustomModal";
+import { format } from "date-fns";
+import { AddListForm } from "./AddListForm";
 import { checkErrorForm } from "./FormComponents";
 
 function AddToDoList({setToDoList, setShowModal}){
     const [formValues, setFormValues] = React.useState([
-        {id: 'startDate', label: 'start date', type: 'date', value: '', required: true, condition: true},
+        {id: 'startDate', label: 'start date', type: 'date', value: format(new Date(), 'yyyy-MM-dd'), required: true, condition: true},
         {id: `acts`, label: 'activity', type: 'text', value: 'Activity 1', required: true, condition: true},
     ]);
 
@@ -18,9 +20,7 @@ function AddToDoList({setToDoList, setShowModal}){
                 setError(true)
                 return
             }
-            else{
-                setError(false)
-            }
+            else { setError(false) }
         }
 
         setToDoList(() => {

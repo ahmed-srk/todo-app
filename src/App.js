@@ -1,16 +1,24 @@
 import React from "react";
-import { DisplayTable } from "./DisplayTable";
+import Dashboard from "./Dashboard";
 import OpenPage from "./OpenPage";
 
 function App() {
-    const [toDoList, setToDoList] = React.useState()
+    const [toDoList, setToDoList] = React.useState(() => JSON.parse(localStorage.getItem('toDoList')) || null)
+
+    React.useEffect(() => {
+        localStorage.setItem('toDoList', JSON.stringify(toDoList))
+        if (!toDoList){ localStorage.setItem('dailyUpdate', null) }
+
+    }, [toDoList])
+
+    console.log(toDoList)
 
     return (
         <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-500 to-blue-600">
             {
-                toDoList ?
-                <DisplayTable {...toDoList} /> :
-                <OpenPage setToDoList={setToDoList} />
+                toDoList === null ?
+                <OpenPage setToDoList={setToDoList} /> :
+                <Dashboard toDoList={toDoList} setToDoList={setToDoList} />
             }
         </div>
     );
