@@ -8,13 +8,10 @@ function App() {
     React.useEffect(() => {
         localStorage.setItem('toDoList', JSON.stringify(toDoList))
         if (!toDoList){ localStorage.setItem('dailyUpdate', null) }
-
     }, [toDoList])
 
-    console.log(toDoList)
-
     return (
-        <div className="App flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-500 to-blue-600">
+        <div className="App flex justify-center items-center min-w-fit min-h-screen bg-gradient-to-r from-purple-500 to-blue-600">
             {
                 toDoList === null ?
                 <OpenPage setToDoList={setToDoList} /> :
