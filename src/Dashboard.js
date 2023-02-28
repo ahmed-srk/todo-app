@@ -3,7 +3,8 @@ import {addDays, differenceInCalendarDays, eachDayOfInterval, isMonday, isThisWe
 import { DisplayTable } from "./DisplayTable";
 
 export default function Dashboard({toDoList, setToDoList}){
-    const [pinToday, setPinToday] = React.useState(new Date())
+    const [today, setToday] = React.useState(new Date())
+    const [numberOfWeeks, setNumberOfWeeks] = React.useState(0)
 
     const [weekRange, setWeekRange] = React.useState(() => {
         const toDoStartDate = new Date(toDoList.startDate)
@@ -18,7 +19,7 @@ export default function Dashboard({toDoList, setToDoList}){
 
     const deleteToDoList = () => { setToDoList(null) }
 
-    function changeWeekRange(id){
+    const changeWeekRange = (id) => {
         if (id === -1 && differenceInCalendarDays(new Date(weekRange[0]), new Date(toDoList.startDate)) > 0){
             setWeekRange((prev) => eachDayOfInterval( {start: previousMonday(prev[0]), end: previousSunday(prev[0])} ))
         }
@@ -33,19 +34,27 @@ export default function Dashboard({toDoList, setToDoList}){
     }, [toDoList, JSON.stringify(dailyUpdate)])
 
     React.useEffect(() => {
+        if (numberOfWeeks > 0){
+            setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, weekRange.map((day) => ({dayOfWeek: day, completed: false}))]})))
+        }
+        // eslint-disable-next-line
+    }, [numberOfWeeks])
+
+    React.useEffect(() => {
         setInterval(() => {
-            const today = new Date()
+            const currentDay = new Date()
             
-            // checking if pinDate is not equal to the current date in order to update it
+            // checking if today is not equal to the currentDay in order to update it
             // and render the whole component, thus triggering the table to change
-            if(pinToday.getDate() !== today.getDate()){
-                setPinToday(today)
+            if(today.getDate() !== currentDay.getDate()){
+                setToday(currentDay)
             }
 
-            // checking if the week has changed and then updating the weekRange and adding it to the dailyUpdate
+            // checking if the week has changed and then updating the weekRange
+            // and the numberOfWeeks in order to update the dailyUpdate list
             if(!isThisWeek(new Date(weekRange[0]), {weekStartsOn: 1}) && isMonday(today)){
                 setWeekRange(eachDayOfInterval( {start: today, end: addDays(today, 6)} ))
-                setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, weekRange.map((day) => ({dayOfWeek: day, completed: false}))]})))
+                setNumberOfWeeks((prev) => prev + 1)
             }
         }, 1000)
 
@@ -59,8 +68,6 @@ export default function Dashboard({toDoList, setToDoList}){
                 { <DisplayTable startDate={toDoList.startDate} dailyUpdate={dailyUpdate} setDailyUpdate={setDailyUpdate} weekRange={weekRange} /> }
                 { !isThisWeek(new Date(weekRange[0]), {weekStartsOn: 1}) && <ArrowButton id={1} sign = "&gt;" onClick={(id) => changeWeekRange(id)} /> }
             </div>
-
-
             <button onClick={() => deleteToDoList()} 
                     className=" bg-gray-900 text-white font-bold uppercase text-sm py-4 px-12 rounded-md active:shadow-[inset_3px_3px_3px_rgba(0,0,0,0.5)] outline-none focus:outline-none">
                 Make New To-Do List

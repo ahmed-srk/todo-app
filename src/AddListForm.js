@@ -10,7 +10,7 @@ export function AddListForm({formValues, setFormValues, errorMsg}){
                 if (itemIndex === index){
                     if (index === 0){
                         return (
-                        isThisWeek(new Date(value), { weekStartsOn: 1 }) && differenceInCalendarDays(new Date(value), new Date()) <= 0 ?
+                            isThisWeek(new Date(value), { weekStartsOn: 1 }) && differenceInCalendarDays(new Date(value), new Date()) <= 0 ?
                             {...item, value: value, condition: true} :
                             {...item, value: value, condition: false}
                         )
