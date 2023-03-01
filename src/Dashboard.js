@@ -1,15 +1,15 @@
 import React from "react";
-import {addDays, differenceInCalendarDays, eachDayOfInterval, isMonday, isThisWeek, nextMonday, nextSunday, previousMonday, previousSunday} from 'date-fns'
+import {addWeeks, differenceInCalendarDays, differenceInCalendarWeeks, eachDayOfInterval, isMonday, isThisWeek, nextMonday, nextSunday, previousMonday, previousSunday} from 'date-fns'
 import { DisplayTable } from "./DisplayTable";
 
 export default function Dashboard({toDoList, setToDoList}){
     const [today, setToday] = React.useState(new Date())
-    const [numberOfWeeks, setNumberOfWeeks] = React.useState(0)
+    const [numberOfWeeks, setNumberOfWeeks] = React.useState(1)
 
     const [weekRange, setWeekRange] = React.useState(() => {
         const toDoStartDate = new Date(toDoList.startDate)
         const weekStartDate = isMonday(toDoStartDate) ? toDoStartDate : previousMonday(toDoStartDate)
-        return eachDayOfInterval( {start: weekStartDate, end: addDays(weekStartDate, 6)} )
+        return eachDayOfInterval( {start: weekStartDate, end: nextSunday(weekStartDate)} )
     })
 
     const [dailyUpdate, setDailyUpdate] = React.useState(
@@ -29,37 +29,48 @@ export default function Dashboard({toDoList, setToDoList}){
     }
 
     React.useEffect(() => {
-        localStorage.setItem('dailyUpdate', JSON.stringify(dailyUpdate))
+        setInterval(() => {
+            const currentDay = new Date()
+            const diffInWeeks = differenceInCalendarWeeks(currentDay, weekRange[0], {weekStartsOn: 1})
+            
+            // checking if today is not equal to the currentDay and if the weekRange is within this week 
+            // in order to update today and render the whole component, thus triggering the table to change
+            if (today.getDate() !== currentDay.getDate() && diffInWeeks === 0){
+                setToday(currentDay)
+            }
+            // checking if the week has changed
+            // and then updating the dailyUpdate list with the previous weeks
+            // and then updating the weekRange according to this current week
+            // and finally updating the numberOfWeeks to update dailyUpdate
+            else if (diffInWeeks > 0) {
+                for(let i = 1; i < diffInWeeks; i++){
+                    const monday = addWeeks(weekRange[0], i)
+                    const week = (eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
+                    setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, week.map((day) => ({dayOfWeek: day, completed: false}))]})))
+                }
+
+                const monday = isMonday(currentDay) ? currentDay : previousMonday(currentDay)
+                setWeekRange(eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
+                setNumberOfWeeks((prev) => prev + diffInWeeks)
+            }
+        }, 1000)
+
         // eslint-disable-next-line
-    }, [toDoList, JSON.stringify(dailyUpdate)])
+    }, [])
+
+    console.log(dailyUpdate)
 
     React.useEffect(() => {
-        if (numberOfWeeks > 0){
+        if (numberOfWeeks > 1){
             setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, weekRange.map((day) => ({dayOfWeek: day, completed: false}))]})))
         }
         // eslint-disable-next-line
     }, [numberOfWeeks])
 
     React.useEffect(() => {
-        setInterval(() => {
-            const currentDay = new Date()
-            
-            // checking if today is not equal to the currentDay in order to update it
-            // and render the whole component, thus triggering the table to change
-            if(today.getDate() !== currentDay.getDate()){
-                setToday(currentDay)
-            }
-
-            // checking if the week has changed and then updating the weekRange
-            // and the numberOfWeeks in order to update the dailyUpdate list
-            if(!isThisWeek(new Date(weekRange[0]), {weekStartsOn: 1}) && isMonday(today)){
-                setWeekRange(eachDayOfInterval( {start: today, end: addDays(today, 6)} ))
-                setNumberOfWeeks((prev) => prev + 1)
-            }
-        }, 1000)
-
+        localStorage.setItem('dailyUpdate', JSON.stringify(dailyUpdate))
         // eslint-disable-next-line
-    }, [])
+    }, [toDoList, JSON.stringify(dailyUpdate)])
 
     return(
         <div className=" flex flex-col justify-center items-center space-y-12">

@@ -1,5 +1,4 @@
 import React from "react";
-// eslint-disable-next-line
 import {differenceInCalendarDays, format, isToday} from 'date-fns'
 
 export function DisplayTable({startDate, dailyUpdate, setDailyUpdate, weekRange}){
