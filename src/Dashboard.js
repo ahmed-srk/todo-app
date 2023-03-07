@@ -6,11 +6,13 @@ export default function Dashboard({toDoList, setToDoList}){
     const [today, setToday] = React.useState(new Date())
     const [numberOfWeeks, setNumberOfWeeks] = React.useState(1)
 
-    const [weekRange, setWeekRange] = React.useState(() => {
+    const initiateWeekRange = () => {
         const toDoStartDate = new Date(toDoList.startDate)
         const weekStartDate = isMonday(toDoStartDate) ? toDoStartDate : previousMonday(toDoStartDate)
-        return eachDayOfInterval( {start: weekStartDate, end: nextSunday(weekStartDate)} )
-    })
+        return eachDayOfInterval( {start: weekStartDate, end: nextSunday(weekStartDate)} )   
+    }
+
+    const [weekRange, setWeekRange] = React.useState(() => JSON.parse(localStorage.getItem('weekRange')) || initiateWeekRange())
 
     const [dailyUpdate, setDailyUpdate] = React.useState(
         () => JSON.parse(localStorage.getItem('dailyUpdate')) ||
@@ -21,44 +23,40 @@ export default function Dashboard({toDoList, setToDoList}){
 
     const changeWeekRange = (id) => {
         if (id === -1 && differenceInCalendarDays(new Date(weekRange[0]), new Date(toDoList.startDate)) > 0){
-            setWeekRange((prev) => eachDayOfInterval( {start: previousMonday(prev[0]), end: previousSunday(prev[0])} ))
+            setWeekRange((prev) => eachDayOfInterval( {start: previousMonday(new Date(prev[0])), end: previousSunday(new Date(prev[0]))} ))
         }
         else if (id === 1 && !isThisWeek(new Date(weekRange[0]), {weekStartsOn: 1})){
-            setWeekRange((prev) => eachDayOfInterval( {start: nextMonday(prev[prev.length-1]), end: nextSunday(prev[prev.length-1])} ))
+            setWeekRange((prev) => eachDayOfInterval( {start: nextMonday(new Date(prev[prev.length-1])), end: nextSunday(new Date(prev[prev.length-1]))} ))
         }
     }
 
     React.useEffect(() => {
-        setInterval(() => {
-            const currentDay = new Date()
-            const diffInWeeks = differenceInCalendarWeeks(currentDay, weekRange[0], {weekStartsOn: 1})
+        const currentDay = new Date()
+        const diffInWeeks = differenceInCalendarWeeks(currentDay, new Date(weekRange[0]), {weekStartsOn: 1})       
             
-            // checking if today is not equal to the currentDay and if the weekRange is within this week 
-            // in order to update today and render the whole component, thus triggering the table to change
-            if (today.getDate() !== currentDay.getDate() && diffInWeeks === 0){
-                setToday(currentDay)
+        // checking if today is not equal to the currentDay and if the weekRange is within this week 
+        // in order to update today and render the whole component, thus triggering the table to change
+        if (today.getDate() !== currentDay.getDate() && diffInWeeks === 0){
+            setToday(currentDay)
+        }
+        // checking if the week has changed
+        // and then updating the dailyUpdate list with the previous weeks
+        // and then updating the weekRange according to this current week
+        // and finally updating the numberOfWeeks to update dailyUpdate
+        else if (diffInWeeks > 0) {
+            for(let i = 1; i < diffInWeeks; i++){
+                const monday = addWeeks(new Date(weekRange[0]), i)
+                const week = (eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
+                setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, week.map((day) => ({dayOfWeek: day, completed: false}))]})))
             }
-            // checking if the week has changed
-            // and then updating the dailyUpdate list with the previous weeks
-            // and then updating the weekRange according to this current week
-            // and finally updating the numberOfWeeks to update dailyUpdate
-            else if (diffInWeeks > 0) {
-                for(let i = 1; i < diffInWeeks; i++){
-                    const monday = addWeeks(weekRange[0], i)
-                    const week = (eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
-                    setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, week.map((day) => ({dayOfWeek: day, completed: false}))]})))
-                }
 
-                const monday = isMonday(currentDay) ? currentDay : previousMonday(currentDay)
-                setWeekRange(eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
-                setNumberOfWeeks((prev) => prev + diffInWeeks)
-            }
-        }, 1000)
+            const monday = isMonday(currentDay) ? currentDay : previousMonday(currentDay)
+            setWeekRange(eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
+            setNumberOfWeeks((prev) => prev + diffInWeeks)
+        }
 
         // eslint-disable-next-line
     }, [])
-
-    console.log(dailyUpdate)
 
     React.useEffect(() => {
         if (numberOfWeeks > 1){
@@ -68,9 +66,14 @@ export default function Dashboard({toDoList, setToDoList}){
     }, [numberOfWeeks])
 
     React.useEffect(() => {
+        localStorage.setItem('weekRange', JSON.stringify(weekRange))
+        // eslint-disable-next-line
+    }, [JSON.stringify(weekRange)])
+
+    React.useEffect(() => {
         localStorage.setItem('dailyUpdate', JSON.stringify(dailyUpdate))
         // eslint-disable-next-line
-    }, [toDoList, JSON.stringify(dailyUpdate)])
+    }, [JSON.stringify(dailyUpdate)])
 
     return(
         <div className=" flex flex-col justify-center items-center space-y-12">

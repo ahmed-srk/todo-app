@@ -7,7 +7,10 @@ function App() {
 
     React.useEffect(() => {
         localStorage.setItem('toDoList', JSON.stringify(toDoList))
-        if (!toDoList){ localStorage.setItem('dailyUpdate', null) }
+        if (!toDoList){ 
+            localStorage.setItem('dailyUpdate', null)
+            localStorage.setItem('weekRange', null)
+        }
     }, [toDoList])
 
     return (

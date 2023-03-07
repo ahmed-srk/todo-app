@@ -18,8 +18,8 @@ export function DisplayTable({startDate, dailyUpdate, setDailyUpdate, weekRange}
                     {
                         weekRange.map((val, key) => 
                             <th key={key} className=" min-w-[120px] p-3">
-                                <p className=" text-gray-200">{format(val, 'yyyy-MM-dd') === format(new Date(startDate), 'yyyy-MM-dd') && `START`}</p>
-                                <span className={isToday(val) ? `text-yellow-200` : `` }>{isToday(val) ? `TODAY` : format(val, 'dd/MM')}</span>
+                                <p className=" text-gray-200">{format(new Date(val), 'yyyy-MM-dd') === format(new Date(startDate), 'yyyy-MM-dd') && `START`}</p>
+                                <span className={isToday(new Date(val)) ? `text-yellow-200` : `` }>{isToday(new Date(val)) ? `TODAY` : format(new Date(val), 'dd/MM')}</span>
                             </th> 
                         )
                     }
@@ -32,7 +32,7 @@ export function DisplayTable({startDate, dailyUpdate, setDailyUpdate, weekRange}
                             <th className=" border-r p-3 min-w-[100px]">{activity.actName[0].toUpperCase() + activity.actName.substring(1)}</th>
                             {
                                 activity.dayUpdate.map((week) => {
-                                    if(format(new Date(week[0].dayOfWeek), 'yyyy-MM-dd') === format(weekRange[0], 'yyyy-MM-dd')){
+                                    if(format(new Date(week[0].dayOfWeek), 'yyyy-MM-dd') === format(new Date(weekRange[0]), 'yyyy-MM-dd')){
                                         return week.map((item, key) => {
                                             if (differenceInCalendarDays(new Date(startDate), new Date(item.dayOfWeek)) > 0){
                                                 return ( <td key={key} className= {`p-3 font-bold text-center text-white bg-gray-700 `}>&#8722;</td> )
