@@ -6,13 +6,15 @@ export default function Dashboard({toDoList, setToDoList}){
     const [today, setToday] = React.useState(new Date())
     const [numberOfWeeks, setNumberOfWeeks] = React.useState(1)
 
-    const initiateWeekRange = () => {
+    const initiateCurrentWeek = () => {
         const toDoStartDate = new Date(toDoList.startDate)
         const weekStartDate = isMonday(toDoStartDate) ? toDoStartDate : previousMonday(toDoStartDate)
         return eachDayOfInterval( {start: weekStartDate, end: nextSunday(weekStartDate)} )   
     }
 
-    const [weekRange, setWeekRange] = React.useState(() => JSON.parse(localStorage.getItem('weekRange')) || initiateWeekRange())
+    const [currentWeek, setCurrentWeek] = React.useState(() => JSON.parse(localStorage.getItem('week')) || initiateCurrentWeek())
+
+    const [weekRange, setWeekRange] = React.useState(currentWeek)
 
     const [dailyUpdate, setDailyUpdate] = React.useState(
         () => JSON.parse(localStorage.getItem('dailyUpdate')) ||
@@ -32,7 +34,7 @@ export default function Dashboard({toDoList, setToDoList}){
 
     React.useEffect(() => {
         const currentDay = new Date()
-        const diffInWeeks = differenceInCalendarWeeks(currentDay, new Date(weekRange[0]), {weekStartsOn: 1})       
+        const diffInWeeks = differenceInCalendarWeeks(currentDay, new Date(currentWeek[0]), {weekStartsOn: 1})       
             
         // checking if today is not equal to the currentDay and if the weekRange is within this week 
         // in order to update today and render the whole component, thus triggering the table to change
@@ -45,13 +47,13 @@ export default function Dashboard({toDoList, setToDoList}){
         // and finally updating the numberOfWeeks to update dailyUpdate
         else if (diffInWeeks > 0) {
             for(let i = 1; i < diffInWeeks; i++){
-                const monday = addWeeks(new Date(weekRange[0]), i)
+                const monday = addWeeks(new Date(currentWeek[0]), i)
                 const week = (eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
                 setDailyUpdate((prev) => prev.map((act) => ({...act, dayUpdate: [...act.dayUpdate, week.map((day) => ({dayOfWeek: day, completed: false}))]})))
             }
 
             const monday = isMonday(currentDay) ? currentDay : previousMonday(currentDay)
-            setWeekRange(eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
+            setCurrentWeek(eachDayOfInterval( {start: monday, end: nextSunday(monday)} ))
             setNumberOfWeeks((prev) => prev + diffInWeeks)
         }
 
@@ -66,9 +68,9 @@ export default function Dashboard({toDoList, setToDoList}){
     }, [numberOfWeeks])
 
     React.useEffect(() => {
-        localStorage.setItem('weekRange', JSON.stringify(weekRange))
+        localStorage.setItem('currentWeek', JSON.stringify(currentWeek))
         // eslint-disable-next-line
-    }, [JSON.stringify(weekRange)])
+    }, [JSON.stringify(currentWeek)])
 
     React.useEffect(() => {
         localStorage.setItem('dailyUpdate', JSON.stringify(dailyUpdate))
